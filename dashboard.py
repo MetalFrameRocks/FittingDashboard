@@ -124,6 +124,7 @@ if data:
         hourly_summary,
         x='hour',
         y='quantity',
+        text ='quantity',
         title="Quantity Over Time (Hourly)"
     )
     hourly_bar.update_layout(xaxis_title="Hour", yaxis_title="Quantity")
