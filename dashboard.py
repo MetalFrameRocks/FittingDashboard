@@ -51,21 +51,6 @@ if data:
 
     with col1:
         st.markdown("### Summary")
-        total_qty = df["quantity"].sum()
-        st.markdown(f"""
-        <div style='
-            border: 1px solid #e1e1e1;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
-            background-color: rgba(14,17,23,0.7);
-            text-align: center;
-            margin-top: 10px;
-        '>
-            <h1 style='font-weight: bold; margin-bottom: 5px;'>{int(total_qty)}</h1>
-            <p style='font-size: 18px;'>📦 Total Quantity</p>
-        </div>
-        """, unsafe_allow_html=True)
 
     with col2:
         st.markdown("### Slicers")
@@ -82,18 +67,33 @@ if data:
             options=["All Models"] + df['model'].unique().tolist(),
             default=["All Models"],
             key="model_filter"
-        )   
+        )
 
-    # Filter the dataframe based on the selected date range
+    # --- 🔍 Filter the Data ---
     filtered_df = df[
-        (df["date"] >= selected_date_range[0]) & 
+        (df["date"] >= selected_date_range[0]) &
         (df["date"] <= selected_date_range[1])
     ]
-
-    # Filter by model
-    filtered_df = filtered_df.copy()
     if "All Models" not in selected_model:
         filtered_df = filtered_df[filtered_df['model'].isin(selected_model)]
+
+    # --- 🧮 KPI: Total Quantity ---
+    total_qty = filtered_df["quantity"].sum()
+    with col1:
+        st.markdown(f"""
+        <div style='
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+            background-color: rgba(14,17,23,0.7);
+            text-align: center;
+            margin-top: 10px;
+        '>
+            <h1 style='font-weight: bold; margin-bottom: 5px;'>{int(total_qty)}</h1>
+            <p style='font-size: 18px;'>📦 Total Quantity</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.divider()
 
@@ -113,27 +113,6 @@ if data:
     st.plotly_chart(unique_models_chart, use_container_width=True)
 
     st.divider()
-
-    st.markdown("""
-    <style>
-    .footer {
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        background-color: rgba(0,0,0,0.7);
-        color: white;
-        padding: 10px 15px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: 'Arial', sans-serif;
-        text-align: center;        
-        font-weight: bold;                              
-        z-index: 100;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-    }
-    </style>
-    <div class="footer">Made with ❤️ by Govind & Deepanshu</div>
-    """, unsafe_allow_html=True)
 
     # --- 📊 Quantity Over Time (Hourly Bar Chart) ---
     st.subheader("📊 Quantity Over Time (Hourly)")
@@ -170,11 +149,34 @@ if data:
 
     st.divider()
 
-    # --- 📋 Full Data Table ---
-    st.subheader("📋 Full Data (All Time)")
-    full_data = df.sort_values("timestamp", ascending=False)
+    # --- 📋 Full Data Table (Filtered) ---
+    st.subheader("📋 Full Data (Filtered)")
+    full_data = filtered_df.sort_values("timestamp", ascending=False)
     if 'serial_number' in full_data.columns:
         full_data = full_data.drop(columns=['serial_number'])
     st.dataframe(full_data.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+
+    # --- Footer ---
+    st.markdown("""
+    <style>
+    .footer {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background-color: rgba(0,0,0,0.7);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: 'Arial', sans-serif;
+        text-align: center;        
+        font-weight: bold;                              
+        z-index: 100;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
+    </style>
+    <div class="footer">Made with ❤️ by Govind & Deepanshu</div>
+    """, unsafe_allow_html=True)
+
 else:
     st.warning("No data found yet.")
