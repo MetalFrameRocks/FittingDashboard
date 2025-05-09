@@ -107,8 +107,7 @@ if data:
         x="Date",
         y="Unique Models",
         title="Unique Models Count Per Day",
-        text="Unique Models",
-        textposition='outside'
+        text="Unique Models"
     )
     unique_models_chart.update_layout(xaxis_title="Date", yaxis_title="Model Count")
     st.plotly_chart(unique_models_chart, use_container_width=True)
@@ -126,7 +125,6 @@ if data:
         x='hour',
         y='quantity',
         text ='quantity',
-        textposition='outside',
         title="Quantity Over Time (Hourly)"
     )
     hourly_bar.update_layout(xaxis_title="Hour", yaxis_title="Quantity")
@@ -145,8 +143,7 @@ if data:
         y='quantity',
         color='model',
         title="Model-wise Total Quantity",
-        text='quantity',
-        textposition='outside'
+        text='quantity'
     )
     model_bar.update_layout(xaxis_title="Model", yaxis_title="Quantity")
     st.plotly_chart(model_bar, use_container_width=True)
