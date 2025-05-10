@@ -36,11 +36,11 @@
     }
 
     h1 {
-      color: white;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-      margin-top: 40px;
-      margin-bottom: 20px;
-      text-align: center;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    margin-bottom: 20px;
+    margin-top: 40px;
+    text-align: center;
     }
 
     .form-container {
@@ -96,20 +96,20 @@
       position: relative;
     }
 
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 320px;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 20px;
-  padding-bottom: 80px; /* 👈 Bottom padding added */
-  overflow-y: auto;
-  box-shadow: 3px 0 10px rgba(0,0,0,0.3);
-  z-index: 999;
-  transition: transform 0.3s ease;
-}
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    padding-bottom: 80px; /* 👈 Bottom padding added */
+    overflow-y: auto;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.3);
+    z-index: 999;
+    transition: transform 0.3s ease;
+  }
 
 
     .sidebar-hidden .sidebar {
@@ -171,7 +171,7 @@
   </div>
 
   <div class="container">
-    <h1>METAL FRAME FITTING</h1>
+    <h1>👓 METAL FRAME FITTING</h1>
     <div class="form-container">
       <img src="4.png" alt="Logo">
       <input type="text" id="model" placeholder="Model Number" autocomplete="off" onkeydown="goToNext(event, 'quantity')">
@@ -257,10 +257,17 @@
       }
     }
 
+    function getStartOfToday() {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);  // Set to midnight
+    return now;
+}
+
     function listenForUpdates() {
+      const startOfToday = getStartOfToday();
       db.collection("submissions")
+        .where("timestamp", ">=", startOfToday)
         .orderBy("timestamp", "desc")
-        .limit(20)
         .onSnapshot(snapshot => {
           const tbody = document.querySelector("#data-table tbody");
           tbody.innerHTML = "";
