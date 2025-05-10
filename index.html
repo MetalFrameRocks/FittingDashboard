@@ -27,7 +27,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      margin-left: 320px; /* space for sidebar */
+      margin-left: 320px;
       transition: margin-left 0.3s ease;
     }
 
@@ -104,7 +104,7 @@
       height: 100vh;
       background: rgba(255, 255, 255, 0.95);
       padding: 20px;
-      padding-bottom: 80px; /* 👈 Bottom padding added */
+      padding-bottom: 80px;
       overflow-y: auto;
       box-shadow: 3px 0 10px rgba(0,0,0,0.3);
       z-index: 999;
@@ -122,12 +122,13 @@
       text-align: center;
     }
 
-    #data-table {
+    table {
       width: 100%;
       border-collapse: collapse;
+      margin-bottom: 20px;
     }
 
-    #data-table th, #data-table td {
+    th, td {
       border: 1px solid #ccc;
       padding: 8px;
       font-size: 14px;
@@ -157,6 +158,17 @@
   <button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
 
   <div class="sidebar">
+    <h2>📊 Today's Summary</h2>
+    <table id="summary-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Total Quantity</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
     <h2>📋 Submitted Data</h2>
     <table id="data-table">
       <thead>
@@ -259,7 +271,7 @@
 
     function getStartOfToday() {
       const now = new Date();
-      now.setHours(0, 0, 0, 0);  // Set to midnight
+      now.setHours(0, 0, 0, 0);
       return now;
     }
 
@@ -270,12 +282,18 @@
         .orderBy("timestamp", "desc")
         .onSnapshot(snapshot => {
           const tbody = document.querySelector("#data-table tbody");
-          tbody.innerHTML = "";
+          const summaryTbody = document.querySelector("#summary-table tbody");
 
-          let serialNumber = snapshot.size; // Start serial number from the total count
+          tbody.innerHTML = "";
+          summaryTbody.innerHTML = "";
+
+          let serialNumber = snapshot.size;
+          const modelSums = {};
 
           snapshot.forEach(doc => {
             const data = doc.data();
+
+            // Submitted data table
             const row = `
               <tr>
                 <td>${serialNumber}</td>
@@ -284,9 +302,26 @@
               </tr>
             `;
             tbody.innerHTML += row;
+            serialNumber--;
 
-            serialNumber--; // Decrease serial number for the next row
+            // Summing by model
+            if (data.model in modelSums) {
+              modelSums[data.model] += data.quantity;
+            } else {
+              modelSums[data.model] = data.quantity;
+            }
           });
+
+          // Summary table
+          for (const model in modelSums) {
+            const row = `
+              <tr>
+                <td>${model}</td>
+                <td>${modelSums[model]}</td>
+              </tr>
+            `;
+            summaryTbody.innerHTML += row;
+          }
         });
     }
 
