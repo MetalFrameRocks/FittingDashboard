@@ -151,7 +151,7 @@ if data:
     st.divider()
 
     # --- 📋 Full Data Table (Filtered) ---
-    st.subheader("📋 Full Data (Filtered)")
+    st.subheader("📋 Full Data Dump")
     full_data = filtered_df.sort_values("timestamp", ascending=False)
     if 'serial_number' in full_data.columns:
         full_data = full_data.drop(columns=['serial_number'])
