@@ -162,7 +162,7 @@ if data:
     <style>
     .footer {
         position: fixed;
-        right: 20px;
+        left: 20px;
         bottom: 20px;
         background-color: rgba(0,0,0,0.7);
         color: white;
