@@ -164,7 +164,7 @@ if data:
         position: fixed;
         left: 20px;
         bottom: 20px;
-        background-color: rgba(0,0,0,0.7);
+        background-color: rgba(0,0,0,0.9);
         color: white;
         padding: 10px 15px;
         border-radius: 10px;
