@@ -275,12 +275,13 @@
       return now;
     }
 
-    function listenForUpdates() {
+    function fetchUpdates() {
       const startOfToday = getStartOfToday();
       db.collection("submissions")
         .where("timestamp", ">=", startOfToday)
         .orderBy("timestamp", "desc")
-        .onSnapshot(snapshot => {
+        .get()
+        .then(snapshot => {
           const tbody = document.querySelector("#data-table tbody");
           const summaryTbody = document.querySelector("#summary-table tbody");
 
@@ -293,7 +294,6 @@
           snapshot.forEach(doc => {
             const data = doc.data();
 
-            // Submitted data table
             const row = `
               <tr>
                 <td>${serialNumber}</td>
@@ -304,7 +304,6 @@
             tbody.innerHTML += row;
             serialNumber--;
 
-            // Summing by model
             if (data.model in modelSums) {
               modelSums[data.model] += data.quantity;
             } else {
@@ -312,7 +311,6 @@
             }
           });
 
-          // Summary table
           for (const model in modelSums) {
             const row = `
               <tr>
@@ -323,7 +321,6 @@
             summaryTbody.innerHTML += row;
           }
 
-          // Add total row
           const totalQuantity = Object.values(modelSums).reduce((a, b) => a + b, 0);
           const totalRow = `
             <tr style="font-weight:bold; background-color:#f0f0f0; color:#000;">
@@ -332,6 +329,9 @@
             </tr>
           `;
           summaryTbody.innerHTML += totalRow;
+        })
+        .catch(error => {
+          console.error("Error fetching updates:", error);
         });
     }
 
@@ -339,7 +339,9 @@
       document.body.classList.toggle("sidebar-hidden");
     }
 
-    listenForUpdates();
+    // Fetch immediately, then every 5 seconds
+    fetchUpdates();
+    setInterval(fetchUpdates, 5000);
   </script>
 </body>
 </html>
