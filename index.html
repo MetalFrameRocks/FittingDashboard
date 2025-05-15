@@ -242,6 +242,9 @@
         messageDiv.textContent = "✅ Data submitted successfully!";
         messageDiv.style.color = "green";
 
+        // 👇 Fetch fresh data immediately after successful submit
+        fetchUpdates();
+
         setTimeout(() => {
           messageDiv.textContent = "";
         }, 3000);
@@ -339,9 +342,8 @@
       document.body.classList.toggle("sidebar-hidden");
     }
 
-    // Fetch immediately, then every 5 seconds
+    // 🔄 Initial data fetch on page load
     fetchUpdates();
-    setInterval(fetchUpdates, 5000);
   </script>
 </body>
 </html>
