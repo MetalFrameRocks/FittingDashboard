@@ -43,12 +43,29 @@
       text-align: center;
     }
 
+    .form-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
     .form-container {
       background: rgba(255, 255, 255, 0.90);
       padding: 40px;
       border-radius: 15px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
       text-align: center;
+      width: 300px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      text-transform: uppercase;
     }
 
     .form-container img {
@@ -56,7 +73,7 @@
       margin-bottom: 10px;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -84,6 +101,14 @@
       font-weight: bold;
     }
 
+    select {
+      width: 108%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
     .footer {
       margin-top: 40px;
       text-align: center;
@@ -101,7 +126,7 @@
       position: fixed;
       left: 0;
       top: 0;
-      width: 320px;
+      width: 350px;
       height: 100vh;
       background: rgba(255, 255, 255, 0.95);
       padding: 20px;
@@ -149,6 +174,7 @@
       cursor: pointer;
     }
 
+
     .toggle-sidebar-btn:hover {
       background: #1976D2;
     }
@@ -176,6 +202,7 @@
         <tr>
           <th>Serial No.</th>
           <th>Model</th>
+          <th>Operator</th>
           <th>Quantity</th>
         </tr>
       </thead>
@@ -187,7 +214,14 @@
     <h1>👓 METAL FRAME FITTING</h1>
     <div class="form-container">
       <img src="4.png" alt="Logo">
-      <input type="text" id="model" placeholder="PID Number" autocomplete="off" onkeydown="goToNext(event, 'quantity')">
+      <input type="text" id="model" placeholder="PID Number" autocomplete="off" onkeydown="goToNext(event, 'operator')">
+      <select id="operator" onkeydown="goToNext(event, 'quantity')">
+        <option value="" disabled selected>Select Operator</option>
+        <option value="Nisha">Nisha</option>
+        <option value="Shweta">Shweta</option>
+        <option value="Anju">Anju</option>
+        <option value="Kamini">Kamini</option>
+      </select>
       <input type="number" id="quantity" placeholder="Quantity" autocomplete="off" onkeydown="submitOnEnter(event)">
       <button onclick="submitData()">Submit</button>
       <div id="message" class="message"></div>
@@ -217,13 +251,14 @@
 
     async function submitData() {
       const model = document.getElementById("model").value.trim();
+      const operator = document.getElementById("operator").value;
       const quantity = parseInt(document.getElementById("quantity").value.trim());
       const messageDiv = document.getElementById("message");
       const button = document.querySelector("button");
       button.disabled = true;
 
-      if (!model || isNaN(quantity)) {
-        messageDiv.textContent = "⚠️ Please fill in both fields correctly.";
+      if (!model || !operator || isNaN(quantity)) {
+        messageDiv.textContent = "⚠️ Please fill in all fields correctly.";
         messageDiv.style.color = "red";
         button.disabled = false;
         return;
@@ -232,11 +267,13 @@
       try {
         await db.collection("submissions").add({
           model: model,
+          operator: operator,
           quantity: quantity,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
         document.getElementById("model").value = "";
+        document.getElementById("operator").value = "";
         document.getElementById("quantity").value = "";
         document.getElementById("model").focus();
 
@@ -302,6 +339,7 @@
               <tr>
                 <td>${serialNumber}</td>
                 <td>${data.model}</td>
+                <td>${data.operator}</td>
                 <td>${data.quantity}</td>
               </tr>
             `;
