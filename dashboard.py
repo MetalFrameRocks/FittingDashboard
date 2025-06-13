@@ -151,6 +151,7 @@ if data:
     st.divider()
 
     # --- 📋 Full Data Table (Filtered) ---
+    df["timestamp"] = df["timestamp"].dt.tz_convert("Asia/Kolkata")
     st.subheader("📋 Full Data Dump")
     full_data = filtered_df.sort_values("timestamp", ascending=False)
     if 'serial_number' in full_data.columns:
