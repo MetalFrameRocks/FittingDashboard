@@ -151,12 +151,13 @@ if data:
     st.divider()
 
     # --- 📋 Full Data Table (Filtered) ---
-    df["timestamp"] = df["timestamp"].dt.tz_convert("Asia/Kolkata")
     st.subheader("📋 Full Data Dump")
     full_data = filtered_df.sort_values("timestamp", ascending=False)
     if 'serial_number' in full_data.columns:
-        full_data['timestamp'] = full_data['timestamp'].dt.strftime('%H:%M')
-st.dataframe(full_data.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+        full_data = full_data.drop(columns=['serial_number'])
+    # Format timestamp to show only HH:MM (24-hour format)
+    full_data['timestamp'] = full_data['timestamp'].dt.strftime('%H:%M')
+    st.dataframe(full_data.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
     # --- Footer ---
     st.markdown("""
