@@ -150,14 +150,48 @@ if data:
 
     st.divider()
 
-    # --- 📋 Full Data Table (Filtered) ---
-    st.subheader("📋 Full Data Dump")
-    full_data = filtered_df.sort_values("timestamp", ascending=False)
-    if 'serial_number' in full_data.columns:
-        full_data = full_data.drop(columns=['serial_number'])
-    # Format timestamp to show only HH:MM (24-hour format)
-    full_data['timestamp'] = full_data['timestamp'].dt.strftime('%H:%M')
-    st.dataframe(full_data.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+   # --- 📋 Full Data Table (Filtered) ---
+st.subheader("📋 Full Data Dump")
+full_data = filtered_df.sort_values("timestamp", ascending=False).copy()
+
+# Format timestamp to show only HH:MM (24-hour format) for display
+full_data['timestamp_display'] = full_data['timestamp'].dt.strftime('%H:%M')
+
+# Keep original timestamp for export but in IST timezone
+full_data['timestamp_export'] = full_data['timestamp'].dt.tz_convert('Asia/Kolkata')
+
+# Drop serial_number if exists
+if 'serial_number' in full_data.columns:
+    full_data_display = full_data.drop(columns=['serial_number', 'timestamp'])
+else:
+    full_data_display = full_data.drop(columns=['timestamp'])
+
+# Rename timestamp_display to timestamp for display
+full_data_display = full_data_display.rename(columns={'timestamp_display': 'timestamp'})
+
+# Display table with just HH:MM format
+st.dataframe(full_data_display.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+
+# Excel Export with HH:MM format
+@st.cache_data
+def convert_to_csv(df):
+    # Create export version with HH:MM format
+    df_export = df.copy()
+    df_export['timestamp'] = df_export['timestamp_export'].dt.strftime('%H:%M')
+    if 'serial_number' in df_export.columns:
+        df_export = df_export.drop(columns=['serial_number', 'timestamp_export', 'timestamp_display'])
+    else:
+        df_export = df_export.drop(columns=['timestamp_export', 'timestamp_display'])
+    return df_export.to_csv(index=False).encode('utf-8')
+
+csv = convert_to_csv(full_data)
+
+st.download_button(
+    label="📥 Download Data as CSV",
+    data=csv,
+    file_name='fitting_data.csv',
+    mime='text/csv',
+)
 
     # --- Footer ---
     st.markdown("""
