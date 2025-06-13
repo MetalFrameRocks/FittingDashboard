@@ -154,8 +154,8 @@ if data:
     st.subheader("📋 Full Data Dump")
     full_data = filtered_df.sort_values("timestamp", ascending=False)
     if 'serial_number' in full_data.columns:
-        full_data = full_data.drop(columns=['serial_number'])
-    st.dataframe(full_data.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+        full_data['timestamp'] = full_data['timestamp'].dt.strftime('%H:%M')
+st.dataframe(full_data.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
     # --- Footer ---
     st.markdown("""
