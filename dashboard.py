@@ -150,45 +150,45 @@ if data:
 
     st.divider()
 
-# --- 📋 Full Data Table (Filtered) ---
-st.subheader("📋 Full Data Dump")
+    # --- 📋 Full Data Table (Filtered) ---
+    st.subheader("📋 Full Data Dump")
 
-# Create working copy and ensure IST timezone
-full_data = filtered_df.sort_values("timestamp", ascending=False).copy()
-full_data['timestamp'] = full_data['timestamp'].dt.tz_convert('Asia/Kolkata')
+    # Create working copy and ensure IST timezone
+    full_data = filtered_df.sort_values("timestamp", ascending=False).copy()
+    full_data['timestamp'] = full_data['timestamp'].dt.tz_convert('Asia/Kolkata')
 
-# Format timestamp as HH:MM for display
-full_data_display = full_data.copy()
-full_data_display['timestamp'] = full_data_display['timestamp'].dt.strftime('%H:%M')
+    # Format timestamp as HH:MM for display
+    full_data_display = full_data.copy()
+    full_data_display['timestamp'] = full_data_display['timestamp'].dt.strftime('%H:%M')
 
-# Drop serial_number if exists
-if 'serial_number' in full_data_display.columns:
-    full_data_display = full_data_display.drop(columns=['serial_number'])
+    # Drop serial_number if exists
+    if 'serial_number' in full_data_display.columns:
+        full_data_display = full_data_display.drop(columns=['serial_number'])
 
-# Display table
-st.dataframe(full_data_display.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+    # Display table
+    st.dataframe(full_data_display.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
-# Prepare data for export - ensure HH:MM format in IST
-@st.cache_data
-def prepare_export_data(df):
-    export_df = df.copy()
-    # Convert to IST and format as HH:MM
-    export_df['timestamp'] = pd.to_datetime(export_df['timestamp']).dt.tz_convert('Asia/Kolkata').dt.strftime('%H:%M')
-    if 'serial_number' in export_df.columns:
-        export_df = export_df.drop(columns=['serial_number'])
-    return export_df
+    # Prepare data for export - ensure HH:MM format in IST
+    @st.cache_data
+    def prepare_export_data(df):
+        export_df = df.copy()
+        # Convert to IST and format as HH:MM
+        export_df['timestamp'] = pd.to_datetime(export_df['timestamp']).dt.tz_convert('Asia/Kolkata').dt.strftime('%H:%M')
+        if 'serial_number' in export_df.columns:
+            export_df = export_df.drop(columns=['serial_number'])
+        return export_df
 
-# Create and download CSV
-export_data = prepare_export_data(full_data)
-csv = export_data.to_csv(index=False, date_format='%H:%M').encode('utf-8')
+    # Create and download CSV
+    export_data = prepare_export_data(full_data)
+    csv = export_data.to_csv(index=False).encode('utf-8')
 
-st.download_button(
-    label="📥 Download Data as CSV",
-    data=csv,
-    file_name='fitting_data.csv',
-    mime='text/csv',
-    help="Download will contain timestamps in HH:MM format (IST timezone)"
-)
+    st.download_button(
+        label="📥 Download Data as CSV",
+        data=csv,
+        file_name='fitting_data.csv',
+        mime='text/csv',
+        help="Download will contain timestamps in HH:MM format (IST timezone)"
+    )
 
     # --- Footer ---
     st.markdown("""
