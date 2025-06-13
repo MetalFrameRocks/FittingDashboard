@@ -150,38 +150,32 @@ if data:
 
     st.divider()
 
-   # --- 📋 Full Data Table (Filtered) ---
+  # --- 📋 Full Data Table (Filtered) ---
 st.subheader("📋 Full Data Dump")
 full_data = filtered_df.sort_values("timestamp", ascending=False).copy()
 
-# Format timestamp to show only HH:MM (24-hour format) for display
-full_data['timestamp_display'] = full_data['timestamp'].dt.strftime('%H:%M')
+# Ensure timestamp is in IST (Asia/Kolkata) timezone
+full_data['timestamp'] = full_data['timestamp'].dt.tz_convert('Asia/Kolkata')
 
-# Keep original timestamp for export but in IST timezone
-full_data['timestamp_export'] = full_data['timestamp'].dt.tz_convert('Asia/Kolkata')
+# Create display version with just HH:MM format
+full_data_display = full_data.copy()
+full_data_display['timestamp'] = full_data_display['timestamp'].dt.strftime('%H:%M')
 
 # Drop serial_number if exists
-if 'serial_number' in full_data.columns:
-    full_data_display = full_data.drop(columns=['serial_number', 'timestamp'])
-else:
-    full_data_display = full_data.drop(columns=['timestamp'])
-
-# Rename timestamp_display to timestamp for display
-full_data_display = full_data_display.rename(columns={'timestamp_display': 'timestamp'})
+if 'serial_number' in full_data_display.columns:
+    full_data_display = full_data_display.drop(columns=['serial_number'])
 
 # Display table with just HH:MM format
 st.dataframe(full_data_display.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
-# Excel Export with HH:MM format
+# Excel Export with HH:MM format in IST
 @st.cache_data
 def convert_to_csv(df):
-    # Create export version with HH:MM format
+    # Create export version with HH:MM format in IST
     df_export = df.copy()
-    df_export['timestamp'] = df_export['timestamp_export'].dt.strftime('%H:%M')
+    df_export['timestamp'] = df_export['timestamp'].dt.strftime('%H:%M')
     if 'serial_number' in df_export.columns:
-        df_export = df_export.drop(columns=['serial_number', 'timestamp_export', 'timestamp_display'])
-    else:
-        df_export = df_export.drop(columns=['timestamp_export', 'timestamp_display'])
+        df_export = df_export.drop(columns=['serial_number'])
     return df_export.to_csv(index=False).encode('utf-8')
 
 csv = convert_to_csv(full_data)
@@ -192,7 +186,6 @@ st.download_button(
     file_name='fitting_data.csv',
     mime='text/csv',
 )
-
     # --- Footer ---
     st.markdown("""
     <style>
